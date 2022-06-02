@@ -1,0 +1,1120 @@
+//Fatimah Aqaqah - Manar Al-Makki - Sama Alhamdan - Maryam Kamel - Hatoon AlZahrani - Abeer Majhali
+
+#include <iostream>
+#include <iomanip> 
+#include <conio.h>
+#include <stdlib.h>
+#include <string>
+#include <windows.h>
+#include <cstdio>
+#include <math.h>
+#include <cstring>
+#include <fstream>
+using namespace std;
+
+struct Info 
+{
+	int L; //Length of boxes
+	int W; //Width of boxes
+	int count; //Number of boxes
+	int x; // x-coordnaite 
+	int y; // y-coordnaite
+	char ch; // the choice of the user  (A intro, 0 end, N instrcutions, M play morse code)
+} Data = {8, 36, 3, 20, 7, 'u'}; //Global object will be used in designing the window
+char ch; //will be used with Data.ch (To Not store any invaild input in Data.ch by checking its value befor assinge it to Data.ch)
+
+
+const int size_game= 10; //the size of the game(Number of Q)
+int size_game_full = 8; 
+const int size_user= 2; //the size of the "Users" (Number of user)
+
+struct Morse //First game iformation 
+{
+	string E_word[size_game];
+	string M_code[size_game];
+} G1 = {
+	{ "Hi", "Help", "Name", "Fruit", "Map", "Book", "Voice", "Family"} ,
+	{".... ..", ".... . ... ..", ". ._ _ .", "... .. .. ", "_ ._ ..", "... _ _ .", "... _ .. .. .", "... . _ .. ... _."}
+	};
+
+struct user // The information for each user
+{
+	string id;
+	string name;
+	string num; 
+	string email;
+} ;
+
+struct user_log_in
+{
+	float num; //Mobile number
+	string name; //Name
+	string user_name; //User name
+	string pass; //Password 
+} User_game [size_user]; //Global object of type user_log_in
+
+string Instr [4] // array of string contains the instructions
+{
+	"Read the morse code carefully", 
+	"Convert morse code into English word",
+	"Type your answer in the answer box then press 'Enter' ", 
+	"You only have 3 attempts to answer then you will start from the beginning "
+};
+
+void users_info_menu() // Function to print the option for the owner 
+{
+cout<<"Choose what you want to do: "<<endl;
+cout<<endl;
+cout<<"\t"<<"1-Show the users information."<<endl;
+cout<<"\t"<<"2-Search about a user by ID."<<endl;
+cout<<"\t"<<"3-Edit user information."<<endl;
+cout<<"\t"<<"4-Add a user."<<endl;
+cout<<"\t"<<"5-Delete a user."<<endl;
+
+}
+
+
+
+//Functions
+void Game_setup(Info); //The main function that directs the user to various windows
+void Draw_win(Info); //Function that draws windows
+void Box_win(int, int, int, int, int, int); //The function that draws squares as in the main interface
+void Box_win(int , int , int , int, int); //The function that draws squares as in the play interface
+void boudres(int , int); //Function that draws page borders
+void Cir(int, int, int); //Function that draws circles (from Internet)
+void cur(int,int); //Function that put the cursor in a certain place (From Internet)
+void Morse_game(Info, int, int); //The play function
+void User_edit(); //Function that allow the owner to edite users information
+void Game_setting( ); //Function that allow the owner to edite game setting
+void Log_in(); 
+void Sign_up();
+bool Checking_ans(string &ans , int size);
+			
+
+//Main function in the c++ program
+int main ()
+{
+	Draw_win(Data);
+	Game_setup(Data);
+	Draw_win(Data); //Draw the "End game" window
+	
+	
+	return 0;
+}
+
+//sistem("CLS") will be used to clear the screan  
+
+void Game_setup(Info Data) //the controle function
+{
+    
+    //If a key was hit 
+	//if(1)
+	//{
+		//Put the 'key' in ch (Not in Data.ch, in order to not store invalid input)
+		ch = _getch(); 
+		switch (ch)
+		{
+			case 'L' : //the Log in window
+			case 'l':
+			{
+				Data.ch = ch;
+				Draw_win(Data);
+				Log_in(); 
+				Game_setup(Data);
+				break;
+			}
+			case 'U' : //the owner/user window
+			case 'u':
+			{
+				Data.ch = ch;
+				Draw_win(Data);
+				Game_setup(Data);
+				break;
+			}
+			case 'S' : //the Sign up window
+			case 's' :
+			{
+				Data.ch = ch;
+				Draw_win(Data);
+				Sign_up();
+				Data.ch = 2; 
+				Game_setup(Data);
+				break;
+			}
+			case 'A' : //if the user was owner
+			case 'a' :
+			{
+				Data.ch = ch;
+				Draw_win(Data);
+				Game_setup(Data); 
+				Data.ch = 0;
+				break;
+			}
+			case 'B' : //if the user was player
+			case 'b' :
+			{
+				Data.ch = ch;
+				Draw_win(Data);
+				Game_setup(Data); 
+				break;
+			}
+			case 'C' : //if the user was owenr & want to edit users information
+			case 'c' :
+			{
+				Data.ch = ch;
+				Draw_win(Data); 
+				User_edit();
+				Data.ch = 'A';
+                Game_setup(Data);
+				break;
+			}
+			case 'D' : //if the user was owenr & want to edit the game setting
+			case 'd' :
+			{
+				Data.ch = ch;
+				Game_setting();
+				Data.ch = 'A';
+                Game_setup(Data);
+				break;
+			}
+			case 'M' : //if the user was a player & want to start play
+			case 'm' :
+			{
+				Data.ch = ch;
+				Morse_game(Data, 3, size_game_full);
+				break;
+			}
+			case 'N' : //if the user was a player & want to read the instructions
+			case 'n' :
+			{
+				Data.ch = ch;
+				Draw_win(Data);
+				Game_setup(Data);
+				break;
+			}
+			case 'E': //end the game
+			case 'e':
+			case '0':
+			{
+				Data.ch = ch;
+				Draw_win(Data);
+				break;
+			}
+			default: //invalid input 
+				{
+					Draw_win(Data); 
+					if ((Data.ch == 'n') || (Data.ch == 'N'))	
+						cur(Data.x +13, Data.y +28);
+					else
+						cur(Data.x +2, Data.y +27);
+							
+					cout<<"Invalid input, please try again!";
+					
+					cur(Data.x, Data.y +39);
+					Game_setup(Data);
+					
+				}
+		}
+		
+//	}
+}
+
+
+void Morse_game( Info Data, int attempt, int size)
+	{
+		if ((getch() == 'e')||(getch() == 'E'))
+		{
+			Data.ch ='E' ; 
+			Game_setup(Data);
+		}
+		else 
+		{
+			Draw_win(Data); 
+			bool Correct_ans = true;
+		
+			if (size > 0) // the size will get smaller each time the player go to the next level (the size will be 0 if the player end the game)
+			{
+				bool end=false; //true if user want to end 
+				
+				//Print the Level Number
+				cur(Data.x/2+ 5*Data.W/8 +3, 19); 
+				cout<< size_game_full - size +1; 
+				
+				//For user answer
+				string *Word = new string ; 
+				//For deleting user answer
+				string word; 
+				
+				//Print the morse code
+				cur(Data.x/2+Data.W/8, 4*Data.y+Data.L/6);
+				cout<<G1.M_code[size-1]; 
+				
+				//Taking & checking the user answer
+				do 
+				{ 	
+					Correct_ans = true; 
+					cur(Data.x/2+Data.W+2, 4*Data.y+Data.L/6);
+					cin>>*Word; 
+					 word = *Word; 
+					//Delet the worninig
+					cur(Data.x, Data.y+6);
+					cout<<"                                     ";
+					
+					
+					if(*Word=="0"){
+					end=true;
+					break;
+					}
+					
+					//If the answer was wrong
+					else if(!(Checking_ans(*Word, size)))
+					{
+						Correct_ans = false;
+						attempt--;
+						cur(Data.x, Data.y);
+						//Print the worining
+						system("Color 04");
+						cout<<"Wrong answar, only "<< attempt<< " attempt are left";
+						//Return the text color to White
+						system("Color 0F");
+						//Delet the user input
+						cur(Data.x/2+Data.W+2, 4*Data.y+Data.L/6);
+						for(int i=0; i< word.length(); i++)
+						{
+							cout<<" ";
+						}
+					}
+				} while ((attempt > 0) && (!Correct_ans)); //If the user has attempts and his answer is wrong
+				delete Word; 
+				
+				if(!end)
+				{
+						if(attempt == 0) // If the user has no attemps, start from the begining
+						{
+							attempt = 3; 
+							size = size_game_full;
+							Morse_game(Data, attempt, size);
+						}
+					
+						else //If the user answer correctly , moves to the next code
+						{
+							size--;
+							Morse_game(Data, attempt, size);
+						}
+				}
+				else
+				{
+				    Data.ch = 'E';
+					Game_setup(Data);
+						
+					}
+
+			}
+			else
+			{
+				cur(Data.x-6, Data.y +34);
+				cout<<"You complete the game ";
+				
+			}
+		}
+	}
+
+bool Checking_ans(string &ans , int size) //check user answer in the game
+			{
+				if(ans != G1.E_word[size-1])
+					return false;
+				else
+					return true;
+									}
+
+void Draw_win(Info Data)
+{
+	system("CLS"); 
+	string stat; //this for design the window 
+	boudres(70, 45);
+
+	if ((Data.ch == 'L')||(Data.ch == 'l'))
+	{
+		Box_win(Data.L, Data.W, Data.count, Data.x, Data.y, 1);
+		cur(Data.x, Data.y-3);
+		cout<<"Imam Abdulrahman Bin Faisal University";
+		stat = "CS Project: Maze Boy!";
+		cur(Data.x+ (Data.W - stat.length())/2 , Data.y+ (Data.L/2));
+		cout<<stat;
+		
+		stat = "Log in";
+		cur(Data.x+ (Data.W - stat.length())/2 , Data.y+1+ (Data.L/2));
+		cout<<stat;
+		
+		stat = "User Name";
+		cur(Data.x+ Data.W/2 - (stat.length()/2), Data.y + 5*Data.L/4 );
+		cout<<stat;
+		
+		stat = "Password";
+		cur(Data.x+ Data.W/2 - (stat.length()/2), Data.y +(7*Data.L/4) + 2*3-3);
+		cout<<stat;
+		
+	    cur(Data.x, Data.y +29);
+	    cout<<  "Press 'S' , to creat a new account";
+	    cur(Data.x+5, Data.y +30);
+	    cout<<"Press 'L', to continue"; 
+		
+	    cur(Data.x+3, 50); //just to move the cursor away
+	}
+	else if ((Data.ch == 'U')||(Data.ch == 'u'))
+	{
+		Box_win(Data.L, Data.W, Data.count, Data.x, Data.y, 1);
+		cur(Data.x, Data.y-3);
+		cout<<"Imam Abdulrahman Bin Faisal University";
+		stat = "CS Project: Maze Boy!";
+		cur(Data.x+ (Data.W - stat.length())/2 , Data.y+ (Data.L/2));
+		cout<<stat;
+		
+		stat = "Owner";
+		cur(Data.x+ Data.W/2 - (stat.length()/2), Data.y + 5*Data.L/4 +3);
+		cout<<stat;
+		
+		stat = "User";
+		cur(Data.x+ Data.W/2 - (stat.length()/2), Data.y +(7*Data.L/4) + 2*3);
+		cout<<stat;
+		
+	    cur(Data.x, Data.y +23);
+	    cout<<"Press 'A' , for controll setting";
+	    cur(Data.x+5, Data.y +24);
+	    cout<<  "Press 'B' , for playing";
+	    cur(Data.x+3, 40); //just to move the cursor away
+	}
+	
+	else if ((Data.ch == 'S')||(Data.ch == 's'))
+	{
+		Box_win(Data.L/2, Data.W/2, Data.count-2, Data.x +10, Data.y, 1);
+		cur(Data.x, Data.y-3);
+		cout<<"Imam Abdulrahman Bin Faisal University";
+		stat = "Sign up";
+		cur(Data.x+10+ (Data.W/2 - stat.length())/2 , Data.y+ (Data.L/2)/2);
+		cout<<stat;
+		for(int i=0; i<4; i++)
+		{
+			Cir(Data.x-5, Data.y+5+ i*6,2);
+			cur(Data.x-3, Data.y +7+i*6);
+			cout<<i+1;
+		}
+		
+			cur(Data.x+5, Data.y +7);
+			cout<<"Mobile number: ";
+			
+			cur(Data.x+5, Data.y +7+ 6);
+			cout<<"Name:  ";
+						
+			cur(Data.x+5, Data.y +7+ 2*6);
+			cout<<"User-name:  ";
+		
+			cur(Data.x+5, Data.y +7+ 3*6);
+			cout<<"Password:  ";
+			Data.ch = 2; 
+			
+		cur(Data.x, 60); //Just to move the cursor away
+	}
+		
+	if ((Data.ch == 'A') || (Data.ch == 'a'))
+	{
+		Box_win(Data.L, Data.W, Data.count, Data.x, Data.y, 1);
+		cur(Data.x, Data.y-3);
+		cout<<"Imam Abdulrahman Bin Faisal University";
+		stat = "CS Project: Maze Boy!";
+		cur(Data.x+ (Data.W - stat.length())/2 , Data.y+ (Data.L/2));
+		cout<<stat;
+		
+		stat = "Users setting";
+		cur(Data.x+ Data.W/2 - (stat.length()/2), Data.y + 5*Data.L/4 +3);
+		cout<<stat;
+		
+		stat = "Game setting";
+		cur(Data.x+ Data.W/2 - (stat.length()/2), Data.y +(7*Data.L/4) + 2*3);
+		cout<<stat;
+		
+	    cur(Data.x, Data.y +23);
+	    cout<<"Press 'C' , for User setting";
+	    cur(Data.x, Data.y +24);
+	    cout<<  "Press 'D' , for Game setting";
+	    cur(Data.x+3, 40); //just to move the cursor away
+	}
+	else if ((Data.ch == 'B') || (Data.ch == 'b'))
+	{
+		Box_win(Data.L, Data.W, Data.count, Data.x, Data.y, 1);
+		cur(Data.x, Data.y-3);
+		cout<<"Imam Abdulrahman Bin Faisal University";
+		stat = "CS Project: Maze Boy!";
+		cur(Data.x+ (Data.W - stat.length())/2 , Data.y+ (Data.L/2));
+		cout<<stat;
+		
+		stat = "Instructions";
+		cur(Data.x+ Data.W/2 - (stat.length()/2), Data.y + 5*Data.L/4 +3);
+		cout<<stat;
+		
+		stat = "Play the Game";
+		cur(Data.x+ Data.W/2 - (stat.length()/2), Data.y +(7*Data.L/4) + 2*3);
+		cout<<stat;
+		
+	    cur(Data.x, Data.y +23);
+	    cout<<  "Press 'N' , to read the instructions";
+	    cur(Data.x+5, Data.y +24);
+	    cout<<"Press 'M' , to start playing";
+	    cur(Data.x+3, 40); //just to move the cursor away
+	}
+	
+	else if ((Data.ch == 'C') || (Data.ch == 'c'))
+	{
+		Box_win(Data.L/2, Data.W/2, Data.count-2, Data.x +10, Data.y, 1);
+		cur(Data.x, Data.y-3);
+		cout<<"Imam Abdulrahman Bin Faisal University";
+		stat = "Users  setting";
+		cur(Data.x+10+ (Data.W/2 - stat.length())/2 , Data.y+ (Data.L/2)/2);
+		cout<<stat; 
+		cur(1,1);
+	}
+	else if ((Data.ch == 'N') || (Data.ch == 'n'))
+	{
+		system("CLS");
+		boudres(100, 45);
+		Box_win(Data.L/2, Data.W/2, Data.count-2, Data.x +10, Data.y, 1);
+		cur(Data.x, Data.y-3);
+		cout<<"Imam Abdulrahman Bin Faisal University";
+		stat = "Instructions";
+		cur(Data.x+10+ (Data.W/2 - stat.length())/2 , Data.y+ (Data.L/2)/2);
+		cout<<stat;
+		for(int i=0; i<4; i++)
+		{
+			Cir(Data.x-5, Data.y+5+ i*6,2);
+			cur(Data.x-3, Data.y +7+i*6);
+			cout<<i+1;
+			cur(Data.x+5, Data.y +7+i*6);
+			cout<<Instr[i];
+		}
+		cur(Data.x+15,  Data.y +29);
+	    cout<<"Press 'M' , to start playing";
+	    cur(Data.x+15,  Data.y +31);
+	    cout<<"Press 'E', to end the game";
+		
+		cur(Data.x, 60); //Just to move the cursor away
+	}
+	else if ((Data.ch == 'M') || (Data.ch == 'm'))
+	{
+		cur(Data.x, Data.y-3); 
+		cout<<"Imam Abdulrahman Bin Faisal University";
+		cur(Data.x/2+ 5*Data.W/8, Data.y+1);
+		cout<<"Morse Code";
+		cur(Data.x, Data.y+5);
+		cout<<"Convert Morse code to English words";
+		Box_win(Data.L/2, Data.W/2, Data.count-1, Data.x/2, 4*Data.y);
+		
+		Cir(Data.x/2+ 5*Data.W/8, Data.y+9, 3);
+		cur(Data.x +1, Data.y +29);		
+		cout<<"To end the game, please press on 0";
+		cur(Data.x-6, Data.y +32);		
+		cout<<"Write the first letter of your ansewer in Upper case";
+		cur(Data.x+3, 40);
+	}
+	
+	else if ((Data.ch == 'E')||(Data.ch=='e'))
+	{
+		Box_win(Data.L, Data.W, Data.count, Data.x, Data.y, 1);
+		cur(Data.x, Data.y-3);
+		cout<<"Imam Abdulrahman Bin Faisal University";
+		stat = "CS Project: Maze Boy!";
+		cur(Data.x+ (Data.W - stat.length())/2 , Data.y+ (Data.L/2));
+		cout<<stat;
+		
+		stat = "End of the game";
+		cur(Data.x+ Data.W/2 - (stat.length()/2), Data.y + 5*Data.L/4 +3);
+		cout<<stat;
+		
+		stat = "Thank you";
+		cur(Data.x+ Data.W/2 - (stat.length()/2), Data.y +(7*Data.L/4) + 2*3);
+		cout<<stat;
+	
+	}
+}
+
+void Box_win(int L, int W, int count, int x, int y, int amp)
+{
+		int k=3;
+		cur(x, y);
+		
+		for(int i=0; i<W; i++)
+		{
+			if((i==0) || (i==W-1))
+				cout<<"+";
+			else
+				cout<<"*";
+		}
+		
+		for(int i=0; i<L-2; i++)
+		{
+			cur(x, y+1+i);
+			for(int j=0; j<W; j++)
+			{
+				if((j==0) || (j==W-1))
+					cout<<"*";
+				else
+					cout<<" ";
+			}
+		
+		}
+		cur(x, y+L-1);
+		for(int i=0; i<W; i++)
+		{
+			if((i==0) || (i==W-1))
+				cout<<"+";
+			else
+				cout<<"*";
+		}
+	if(count >1)
+	{
+		if(amp != 0)
+			Box_win(L/2, W/2, --count, x+= W/4, y+= L+k, --amp);
+		else
+			Box_win(L, W, --count, x, y+= L+k, amp);
+		
+		
+	}
+}
+void Box_win(int L, int W, int count, int x, int y)
+{
+		// L= 5, W=20, count=2, x=8, y=25
+		cur(x, y);
+		for(int i=0; i<W; i++)
+		{
+			if((i==0) || (i==W-1))
+				cout<<"+";
+			else
+				cout<<"*";
+		}
+		
+		for(int i=0; i<L-2; i++)
+		{
+			cur(x, y+1+i);
+			for(int j=0; j<W; j++)
+			{
+			if((j==0) || (j==W-1))
+				cout<<"*";
+			else
+				cout<<" ";
+			}
+		}
+		cur(x, y+L-1);
+		for(int i=0; i<W; i++)
+		{
+			if((i==0) || (i==W -1))
+				cout<<"+";
+			else
+				cout<<"*";
+		}
+	if(count >1)
+		Box_win(L, W, --count, x+2*W, y); 
+}
+
+void Log_in()
+{
+	if ((_kbhit()) && (_getch() == 3))
+		{
+			Data.ch = 3;
+			Game_setup(Data);
+		}
+		else{
+		
+	
+		string user_name, password; 
+		
+		cur(Data.x+ Data.W/4, Data.y + 5*Data.L/4 +3);
+		cin>>user_name;
+	
+		cur(Data.x+ Data.W/4 , Data.y +(7*Data.L/4) + 2*3);
+		cin>>password;
+	
+		bool exist = false, pass = false;
+		for(int i=0; (i< size_user) && (!exist); i++)
+		{
+			if(User_game[i].user_name == user_name)
+			{
+				exist = true;
+				while(!pass)
+				{
+						if(User_game[i].pass == password)
+							pass = true; 
+						else
+						{
+							cur(Data.x+ Data.W/4 , Data.y +(7*Data.L/4) + 2*3);
+							for(int i=0; i<password.length(); i++)
+								cout<<' ';
+							cur(Data.x+ Data.W/4 , Data.y +(7*Data.L/4) + 2*3);
+							cin>>password; 
+						}
+				}
+				
+			}
+		}
+		if (exist == false)
+			cur(Data.x, Data.y + 2*Data.L + 3*3);
+			cout<<"No account found with this user_name "<<user_name<<" !";
+		if ((exist) && (pass))
+			cur(Data.x, Data.y + 2*Data.L + 3*3);
+			  cout<<"You loged in succsafuly";
+}
+}
+
+void Sign_up()
+{
+			cur(Data.x+20, Data.y +7);
+			cin>>User_game[size_user].num ;
+			
+			cur(Data.x+11, Data.y +7+ 6);
+			cin>>User_game[size_user].name ;
+			
+			cur(Data.x+16, Data.y +7+ 2*6);
+			cin>>User_game[size_user].user_name ;
+			
+			cur(Data.x+10, Data.y +7+ 3*6);
+			cin>>User_game[size_user].pass ;
+			
+		cur(Data.x, 60); //Just to move the cursor away
+	}
+
+		
+
+void User_edit() //The 1st option for the owner
+{
+	ifstream read;
+	ofstream write;
+	int continue_;
+	do 
+	{
+		
+		Draw_win(Data);
+		int choise;
+		users_info_menu();
+		cout<<"Choose from the menue: "<<endl;
+		cin>>choise;
+	
+	
+		switch (choise)
+		{
+		
+			case 1:
+			{
+				cout<<"Users Information:"<<endl;
+				string info;
+				read.open("users.txt");
+				if(read.is_open())
+				{
+					cout<<"\tID\tName\tNumber\tEmail"<<endl;
+					while(!read.eof())
+					{
+						for(int i=0; i<4; i++)
+						{
+							getline(read, info, '#');
+							 
+							cout<<'\t'<<info;
+						}
+						cout<<endl; 
+					}
+					read.close();
+				}
+				else
+					cout<<"the file could not open!"<<endl;
+				cout<<"Do you want to do somthing else? (1 for yes/ 0 for no)  : ";
+				cin>>continue_;
+				cout<<endl;
+				break;
+			}
+			
+			case 2:
+			{
+				bool found = false;
+				string id; //we will look for this id
+				string i; //i stand for ID , this will be obtained from the file and compared with id (that the user entered)	
+				user s_user; //object of the struct user
+				read.open("users.txt",ios::in);
+				if(read.is_open())
+				{
+					cout<<"Enter the user ID: "<<endl;
+					cin>>id;
+					
+					while((!read.eof()) && (found == false))
+					{
+						getline(read,i,'#');
+						 
+						if(i==id)
+						{
+								s_user.id = id; 
+								getline(read, s_user.name,'#');
+								 
+								getline(read, s_user.num,'#' );
+								 
+								getline(read, s_user.email, '#' );
+								 
+								found = true; 
+						}
+						else 
+							found = false;
+					}
+					if (found == false)
+						cout<<"the ID not found!"<<endl;
+				read.close();	
+				}	
+				else
+					cout<<"The file could not open!"<<endl;
+					
+				cout<<"Do you want to do somthing else? (1 for yes/ 0 for no)  : ";
+			cin>>continue_;
+			cout<<endl;
+			break;
+			}
+				
+			case 3:
+		{
+				bool found = true;
+				string id; //we will look for this id
+				string i; //i stand for ID , this will be obtained from the file and compared with id (that the user entered)	
+				user s_user; //object of the struct user
+				read.open("users.txt",ios::in);
+				if(read.is_open())
+				{
+					while((!read.eof()) && (found == false))
+						{
+							getline(read,i,'#' );
+							 
+							if(i==id)
+							{
+								s_user.id = id; 
+								getline(read, s_user.name,'#');
+								 
+								getline(read, s_user.num,'#' );
+								 
+								getline(read, s_user.email, '#' );
+								 
+								found = true; 
+							}
+						}
+					read.close();
+					
+					if(found == true)
+				{
+					read.open("users.txt",ios::in);
+					if(read.is_open())
+					{
+						string file_1, file_2;
+						while(!read.eof())
+						{
+							getline(read, file_2, '#'); 
+							 
+							if(file_2 == s_user.id)
+							{
+								cout<<"Enter edited id (if you want to change it) : "; 
+								cin>>file_2; 
+							}
+							else if(file_2 == s_user.name)
+							{
+								cout<<"Enter edited name (if you want to change it) : "; 
+								cin>>file_2; 
+							}
+							else if(file_2 == s_user.num)
+							{
+								cout<<"Enter edited num (if you want to change it) : "; 
+								cin>>file_2; 
+							}
+							else if(file_2 == s_user.email)
+							{
+								cout<<"Enter edited email (if you want to change it) : "; 
+								cin>>file_2; 
+							}
+							
+							file_1 += file_2 + '#';
+						}
+						read.close();
+						write.open("users.txt");
+						write<<file_1;
+						write.close();
+					}
+					else 
+						cout<<"The file could not open!"<<endl;
+				}
+				else
+					cout<<"the ID not found!"<<endl;
+				}
+			
+				cout<<"Do you want to do somthing else? (1 for yes/ 0 for no)  : ";
+			cin>>continue_;
+			cout<<endl;
+			break;
+			}
+			
+			case 4:
+			{
+				
+				write.open("users.txt", ios::app);
+				if(write.is_open())
+				{
+					user new_user; //object of the steuct user
+					cout<<"Enter the new user information in order (id,name, num, email) :   ";
+					
+					cin>>new_user.id>>new_user.name>>new_user.num>>new_user.email;
+					
+					write<<new_user.id<<'#'<<new_user.name<<'#'<<new_user.num<<'#'<<new_user.email;
+				cout<<endl<<"the user added successfully"<<endl;
+				}
+				else 
+					cout<<"the file could not open!"<<endl;
+			
+				cout<<"Do you want to do somthing else? (1 for yes/ 0 for no) : ";
+				cin>>continue_;
+				cout<<endl;
+			break;
+			}
+		
+		case 5:
+			{
+			
+				bool found = false;
+				string id; //we will look for this id
+				string i; //i stand for ID , this will be obtained from the file and compared with id (that the user entered)	
+				user s_user; //object of the struct user
+				
+				cout<<"Enter the user id to delet: ";
+				cin>>id;
+				read.open("users.txt", ios::in);
+				if(read.is_open())
+				{
+					while((!read.eof()) && (found == false))
+						{
+							getline(read,i,'#');
+							 
+							if(i==id)
+							{
+								s_user.id = id; 
+								getline(read, s_user.name,'#');
+								 
+								getline(read, s_user.num,'#' );
+								 
+								getline(read, s_user.email, '#' );
+								 
+								found = true; 
+							}
+						}
+					read.close();
+					
+					if(found == true)
+				{
+					read.open("users.txt");
+					if(read.is_open())
+					{
+						string file_1, file_2;
+						while(!read.eof())
+						{
+							getline(read, file_2, '#'); 
+							 
+							if ((file_2 == s_user.id) || (file_2 == s_user.name) ||(file_2 == s_user.num) || (file_2 == s_user.email) )
+								{
+									int len = file_2.length();
+									file_2 = "";
+									for(int i=0; i<len; i++)
+									{
+										file_2 += ' '; 
+									}
+								}
+							if(file_2[0] != ' ')
+								file_1 += file_2 + '#';
+							else
+								file_1 += file_2;
+						}
+						read.close();
+						for(int i=0; i< file_1.length(); i++)
+						{
+							if(file_1[i] == ' ')
+							{
+								file_1[i] = file_1[i+1];
+							}
+						}
+						write.open("users.txt");
+						write<<file_1;
+						write.close();
+					}
+				else
+					cout<<"The file could not open!"<<endl;
+					
+				}
+				else
+					cout<<"the ID not found!"<<endl;
+				} 
+				else
+					cout<<"The file could not open!"<<endl; 
+					
+				cout<<"Do you want to do somthing else? (1 for yes/ 0 for no)  : ";
+			cin>>continue_;
+			cout<<endl;
+			break;
+				}
+			default:
+				cout<<"Invalide choise!"<<endl;	
+			}
+	} while(continue_!= 0);
+	
+}
+
+//L= 70 W= 35
+void boudres(int W, int L)
+{
+	cur(3,2);
+	for(int i=0; i<W; i++)
+	{
+		if((i==0) || (i==W -1))
+				cout<<"+";
+			else
+				cout<<"*";
+	}
+	
+	for(int i=0; i<L-2; i++)
+		{
+			cur(3, 3+i);
+			for(int j=0; j<W; j++)
+			{
+			if((j==0) || (j==W-1))
+				cout<<"*";
+			else
+				cout<<" ";
+			}
+		}
+		
+		cur(3, 2+L-1);
+		for(int i=0; i<W; i++)
+		{
+			if((i==0) || (i==W -1))
+				cout<<"+";
+			else
+				cout<<"*";
+		}	
+}
+
+
+void Game_setting( ) //The 2ed option for the owner 
+{
+
+	int continue_;
+	do
+	{
+			system("CLS");
+			int choice;
+		    cout<<" choose a number :"<< endl<< "1- add question" << endl<< "2- delete question "<<endl<<"3- adjust question"<<
+			 endl<<"4-view questions "<<endl;
+		    cin>>choice;
+	    
+		    switch (choice)
+		    {
+		    	case 1:
+		    	{
+		    		if(size_game_full != size_game)
+		    			{
+		    				cout<<endl<<"\tThe Morse code: ";
+		    				cin>>G1.M_code[size_game_full];
+		    				cout<<endl<<"\tThe English word: ";
+		    				cin>>G1.E_word[size_game_full];
+		    				size_game_full++;
+		    				
+		    			}
+		    		else
+		    			cout<<"Can not add, the array is full!";
+		    		cout<<endl<<"Do you want to continue? (1 for yes/ 0 for no): "; 
+		    		cin>>continue_; 
+		    		break; 
+		    	}
+		    	case 2:
+		    	{
+		    		int num; 
+		    		cout<<"enter the number of question you want to delete : ";
+		    		cin>>num;
+		    		for(int i=num-1; i<size_game_full-1; i++)
+		    		{
+		    			G1.M_code[i] = G1.M_code[i+1];
+		    			G1.E_word[i] = G1.E_word[i+1];
+		    		}
+		    		cout<<endl<<"The  question "<<num<<" was deleted";
+		    		cout<<endl<<"Do you want to continue? (1 for yes/ 0 for no): "; 
+		    		cin>>continue_; 
+		    		break; 
+		    	}
+		    	case 3:
+		    	{
+		    		int num; 
+		    		cout<<"enter the number of question you want to adit : ";
+		    		cin>>num;
+		    		cout<< "Befor: "<<endl; 
+		    		cout<<"\tMorse code: "<< G1.M_code[num-1]<<endl;
+		    		cout<<"\tEnglish_word: "<< G1.E_word[num-1]<<endl;
+		    		
+		    		cout<< "Edit "<<endl; 
+		    		cout<<"\tMorse code: ";
+		    		cin>> G1.M_code[num-1] ;
+		    		cout<<"\tEnglish_word: ";
+		    		cin>>G1.E_word[num-1];
+		    		
+		    		cout<<endl<<"Do you want to continue? (1 for yes/ 0 for no): "; 
+		    		cin>>continue_; 
+		    		break; 
+		    	}
+		    	case 4:
+		    	{
+		    		cout<<"\tMorse code\tEnglish word"<<endl;
+		    		for(int i=0; i<size_game_full; i++)
+		    		{
+		    			cout<<"\t"<<G1.M_code[i]<<"\t"<<G1.E_word[i]<<endl; 
+		    		}
+		    		cout<<endl<<"Do you want to continue? (1 for yes/ 0 for no): "; 
+		    		cin>>continue_; 
+		    		break; 
+		    	}
+		    }
+	    } while(continue_ != 0);
+	}
+	
+	
+//Source: hoven-in.cdn.ampproject.org website
+//Q: C/C++ Program to draw a circle with stars without graphics.h 
+//Link: https://hoven-in.cdn.ampproject.org/v/s/hoven.in/cpp-graphics/c-program-draw-a-circle.html?amp_gsa=1&amp_js_v=a9&usqp=mq331AQKKAFQArABIIACAw%3D%3D#amp_tf=From%20%251%24s&aoh=16541623478387&referrer=https%3A%2F%2Fwww.google.com&ampshare=https%3A%2F%2Fhoven.in%2Fcpp-graphics%2Fc-program-draw-a-circle.html
+			
+void Cir(int x, int y, int r)
+{
+	// radius 
+	const int A = r;
+	
+	// tolerance 
+	const int B = r;
+	int C;
+	for(int h= -A; h <= A; h++)
+	{
+			cur(x, y);
+		  for(int k= -A; k <= A; k++)
+		  {
+		
+			    C = k*k + h*h - A * A;
+			
+			    abs(C) < B ? cout<< "*" : cout<< " ";
+		
+		  }
+		  
+		  y++;
+		
+	}
+}
+
+//Source: stackoverflow.com website
+//Q: move-text-cursor-to-particular-screen-coordinate
+//Link: https://stackoverflow.com/questions/10401724/move-text-cursor-to-particular-screen-coordinate
+void cur(int x  , int y )
+{
+    HANDLE A;
+    COORD B;
+    A = GetStdHandle(STD_OUTPUT_HANDLE);
+    B.X = x;
+    B.Y = y;
+    SetConsoleCursorPosition ( A , B );
+}
